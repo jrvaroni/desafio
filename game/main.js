@@ -1,6 +1,7 @@
 //Desenvolvido por Júnior Varoni
 
 var canvas, ctx, ALTURA, LARGURA, estadoAtual, img,
+zeroShot = 37, megamanShot = 68
 
 estado = {
     jogar: 0,
@@ -10,24 +11,26 @@ estado = {
 
 player1 = {
     x: 175,
-    y: 340,
+    y: 592,
     altura: spritePlayer1.altura,
     largura: spritePlayer1.altura,
     vida: 100,
     cor: "#f02",
     desenha: function() {
-        //ctx.fillStyle = this.cor,
-        //ctx.fillRect(this.x, this.y, this.largura, this.altura)
-        spritePlayer1_position2.desenha(this.x, this.y)
-        ctx.fillStyle = "#f02";
-        ctx.font = "40px Audiowide";
-        ctx.fillText(player1.vida+"%", this.x, this.y +155 )
+        spritePlayer1.desenha(this.x, this.y, megaman)
+        ctx.fillStyle = "#fff";
+        ctx.font = "20px Audiowide";
+        barPlayer1.desenha(100, 80, btn);
+        ctx.fillText(player1.vida+"%", 110, 100 )
         ctx.fillStyle = "#fff";
         ctx.font = "18px Audiowide";
-        ctx.fillText("Player 1", this.x +5, this.y -35 )
+        ctx.fillText("Megaman", 100, 70 )
     },
     reset: function() {
         spriteReset.desenha(this.x, this.y)
+    },
+    swit: function(e) {
+        spritePlayer1_shot.desenha(this.x, this.y, megaman)
     },
     click: function(e) {
         player2.vida += -20;
@@ -39,19 +42,23 @@ player1 = {
 
 player2 = {
     x: 850,
-    y: 340,
+    y: 585,
     altura: spritePlayer2.altura,
     largura: spritePlayer2.altura,
     vida: 100,
     cor: "#f02",
     desenha: function() {
-        spritePlayer2.desenha(this.x, this.y)
-        ctx.fillStyle = "#f02";
-        ctx.font = "40px Audiowide";
-        ctx.fillText(player2.vida+"%", this.x, this.y +155 )
+        spritePlayer2.desenha(this.x, this.y, zero)
+        ctx.fillStyle = "#fff";
+        ctx.font = "20px Audiowide";
+        barPlayer2.desenha(735, 80, btn);
+        ctx.fillText(player2.vida+"%", 900, 100 )
         ctx.fillStyle = "#fff";
         ctx.font = "18px Audiowide";
-        ctx.fillText("Player 2", this.x -5, this.y -35 )
+        ctx.fillText("Zero", 925, 70 )
+    },
+    swit: function(e) {
+        spritePlayer2_shot.desenha(this.x, this.y, zero)
     },
     click: function(e) {
         player1.vida += -20;
@@ -74,42 +81,62 @@ function main() {
     document.body.appendChild(canvas);
 
     estadoAtual = estado.jogar
-    document.addEventListener("mousedown", click);
+    document.addEventListener("mousedown", click, false);
+    if(estado.jogando){
+        document.addEventListener("keydown",keydownHandler,false);
+        document.addEventListener("keyup",keyupHandler,false);
+    }
     
-    img = new Image();
-    img.src = "sprites.png";
-
+    scene = new Image();
+    scene.src = "sprites/scene.png";
+    btn = new Image();
+    btn.src = "sprites/btn.png";
+    megaman = new Image();
+    megaman.src = "sprites/megaman.png";
+    zero = new Image();
+    zero.src = "sprites/zero.png";
     run()
 }
 
-function click(e){
-    var drawing = false;    
-    var mousePos = { x:0, y:0 };
-    
+function keydownHandler(e){
+    switch(e.keyCode){
+        case zeroShot:
+            player2.swit();
+            player2.click();
+            break;
+        case megamanShot:
+            player1.swit();
+            player1.click();
+            break;
+    }
+}
+
+function keyupHandler(e){
+    switch(e.keyCode){
+        case zeroShot:
+            spritePlayer2.zShot = false;
+            break;
+        case megamanShot:
+            spritePlayer1.mShot = false;
+            break;
+    }
+}
+
+function click(e){    
     if(estadoAtual == estado.jogar) {
         estadoAtual = estado.jogando
+        player1.vida = 100
+        player2.vida = 100
     }
 
     if(estadoAtual == estado.jogando) {
-        lastPos = getMousePos(canvas, e);
-        if(lastPos.y > 340 && lastPos.y < 430 && lastPos.x > 175 && lastPos.x < 265){
-            player1.click()
-        }else if (lastPos.y > 340 && lastPos.y < 430 && lastPos.x > 850 && lastPos.x < 940) {
-            player2.click()
-        }        
+         
     }
 
-    //if(estadoAtual == estado.perdeu)
-    //    estadoAtual = estado.jogar
+    if(estadoAtual == estado.perdeu)
+       estadoAtual = estado.jogar
 }
 
-function getMousePos(canvasDom, mouseEvent) {
-    var rect = canvasDom.getBoundingClientRect();
-    return {
-        x: mouseEvent.clientX - rect.left,
-        y: mouseEvent.clientY - rect.top
-    };
-}
 
 function run() {
     atualiza();
@@ -125,7 +152,7 @@ function desenha(){
     ctx.fillStyle = "#212121";
     ctx.fillRect(0,0, LARGURA, ALTURA);
 
-    bg.desenha(0,0)
+    bg.desenha(0,0, scene)
 
     if(estadoAtual == estado.jogar){
         ctx.fillStyle = "#5468c0";
@@ -135,15 +162,15 @@ function desenha(){
         ctx.fillText("Iniciar", LARGURA / 2 -60, ALTURA / 2 -35);
     }
     else if(estadoAtual == estado.perdeu){
-        spritWinner.desenha(400, 180)
+        spritWinner.desenha(358, 278, btn)
         if(player1.vida > 0){
             ctx.fillStyle = "#ccc";
-            ctx.font = "40px Audiowide";
-            ctx.fillText("player 1 ganhou", LARGURA / 2 -150, ALTURA / 2 +10);
+            ctx.font = "30px Audiowide";
+            ctx.fillText("Megaman ganhou", LARGURA / 2 -100, ALTURA / 2 +10);
         }else if(player2.vida > 0){
             ctx.fillStyle = "#ccc";
-            ctx.font = "40px Audiowide";
-            ctx.fillText("player 2 ganhou", LARGURA / 2 -150, ALTURA / 2 +10);
+            ctx.font = "30px Audiowide";
+            ctx.fillText("Zero ganhou", LARGURA / 2 -60, ALTURA / 2 +10);
             player2.desenha();
         }
     }

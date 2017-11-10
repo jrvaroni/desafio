@@ -27,11 +27,32 @@
             right: 0;
             top: 0;
             bottom: 0;
-            margin:30px auto;
+            margin:100px auto 10px auto;
         }
+
+        audio {
+            position: absolute;
+            right: 10px; top: 10px;
+        }
+
+        .instrucoes {
+            color: #fff;
+            text-align: right;
+            padding: 10px;
+        }
+
     </style>
 </head>
 <body>
+
+    <!-- audio src="music.ogg" controls autoplay loop>
+        <p>Seu nevegador não suporta o elemento audio.</p>
+    </audio-->   
+    <div class="instrucoes">
+        <p>Instruções</p>
+        <p>"D" botão de ação do Megaman</p>
+        <p>"Seta para Esquerda" botão de ação do Zero</p>
+    </div>         
     <script src="megaman.js"></script>
     <script src="main.js"></script>    
 </body>
